@@ -23,3 +23,115 @@ from Highschooler h1, Highschooler h2, likes
 where h1.ID = likes.ID1
 AND h2.ID = likes.ID2
 AND h1.grade - h2.grade >= 2
+
+Question 3
+For every pair of students who both like each other, return the name and grade of both students. 
+Include each pair only once, with the two names in alphabetical order.
+
+select h1.name, h1.grade, h2.name, h2.grade
+from (
+select l1.ID1 as l1ID, l1.ID2 as l2ID
+from likes l1
+) as L1
+Inner join (
+select l2.ID1 as l1ID, l2.ID2 as l2ID
+from likes l2
+) as L2
+Inner join  highschooler h1
+inner join  highschooler h2
+where 
+L1.l1ID = L2.l2ID
+AND L1.l2ID = L2.l1ID
+And h2.ID = L1.l1ID
+AND h1.ID = L1.l2ID
+AND h1.name < h2.name
+
+
+Question 4
+Find all students who do not appear in the Likes table (as a student who likes or is liked) 
+and return their names and grades. Sort by grade, then by name within each grade.
+
+
+select name,grade
+from highschooler
+where highschooler.id not in 
+(select id1
+from likes
+UNION
+select id2
+from likes
+where id1 <>id2) 
+
+
+Question 5
+For every situation where student A likes student B, but we have no information about whom B likes 
+(that is, B does not appear as an ID1 in the Likes table), return A and B's names and grades. 
+
+select h1.name,h1.grade, h2.name, h2.grade
+from (
+select id1,id2
+from likes
+where id2 not in (select id1
+from likes)) as A
+inner join highschooler h1
+inner join highschooler h2
+where h1.id = A.id1
+And h2.id = A.id2
+
+Question 6
+Find names and grades of students who only have friends in the same grade. 
+Return the result sorted by grade, then by name within each grade. 
+
+select name,grade
+from 
+(select id1
+from friend
+union
+select id2
+from friend
+where id1 <> id2) as A
+inner join highschooler
+where id = A.id1
+and A.id1 not in 
+(select distinct id1
+from 
+(select id1,id2
+from friend) as B
+inner join highschooler h1
+inner join highschooler h2
+where h1.grade <> h2.grade
+and B.id1 = h1.id
+and B.id2 = h2.id
+)
+order by grade, name
+
+Question 7
+For each student A who likes a student B where the two are not friends, find if they have a friend C in common (who can introduce them!). For all such trios, return the name and grade of A, B, and C. 
+
+
+
+
+Question 8
+Find the difference between the number of students in the school and the number of different first names. 
+
+select count(A.name)
+from (
+select distinct h1.name
+from highschooler h1, highschooler h2
+where h1.name = h2.name
+and h1.id <> h2.id) as A
+
+
+Question 9
+Find the name and grade of all students who are liked by more than one other student. 
+
+select name,grade
+from highschooler
+inner join 
+(select A.id, count(A.id) as num
+from (select id2 as id 
+from likes
+) as A
+group by A.id) as B
+where B.num > 1
+And B.id = highschooler.id
