@@ -17,6 +17,7 @@ WHERE  Movie.Director = "Steven Spielberg";
 
 Question 2
 Find all years that have a movie that received a rating of 4 or 5, and sort them in increasing order.
+
 SELECT DISTINCT Movie.year
 FROM Rating, Movie
 WHERE Rating.stars < 6 AND Rating.stars > 3
@@ -25,6 +26,7 @@ ORDER BY Movie.year;
 
 Question 3
 Find the titles of all movies that have no ratings. 
+
 SELECT DISTINCT Movie.title
 FROM Movie, Rating
 WHERE Movie.mID NOT IN(
@@ -34,12 +36,15 @@ WHERE Movie.mID = Rating.mID);
 
 Question 4
 Some reviewers didn't provide a date with their rating. Find the names of all reviewers who have ratings with a NULL value for the date. 
+
 SELECT Reviewer.name
 FROM Reviewer, Rating
-WHERE ratingDate IS NULL;
+WHERE ratingDate IS NULL
+AND Reviewer.rID = Rating.rID;
 
 Question 5
 Write a query to return the ratings data in a more readable format: reviewer name, movie title, stars, and ratingDate. Also, sort the data, first by reviewer name, then by movie title, and lastly by number of stars. 
+
 SELECT DISTINCT Reviewer.name, Movie.title, Rating.stars, Rating.ratingDate
 FROM Movie, Reviewer, Rating
 WHERE Reviewer.rID = Rating.rID AND Rating.mID = Movie.mID 
